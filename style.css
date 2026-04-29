@@ -1,0 +1,146 @@
+:root {
+  --bg: #f3f7ff;
+  --card: #ffffff;
+  --text: #1d2738;
+  --primary: #2253d1;
+  --primary-hover: #173f9f;
+  --danger: #c93447;
+  --border: #d8e0ef;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(180deg, #e8efff 0%, var(--bg) 100%);
+  color: var(--text);
+}
+
+.app {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+header {
+  background: #dbe7ff;
+  border: 1px solid #c6d5f6;
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+header h1 {
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 3px 10px rgba(22, 46, 93, 0.06);
+}
+
+.controls {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.95rem;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--primary-hover);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+button.danger {
+  background: var(--danger);
+}
+
+.layout {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+#queue-list,
+#history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.queue-item,
+.history-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.7rem;
+  background: #f9fbff;
+}
+
+.character {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.character img {
+  width: 76px;
+  height: 76px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+.character h3 {
+  margin: 0 0 0.25rem 0;
+}
+
+.placeholder {
+  color: #576177;
+}
+
+.history-panel,
+.status {
+  margin-top: 1rem;
+}
+
+.status {
+  min-height: 1.2rem;
+  font-weight: 600;
+}
+
+.status.ok {
+  color: #195c2f;
+}
+
+.status.error {
+  color: #8f2232;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
