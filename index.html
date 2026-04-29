@@ -1,46 +1,35 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Central de Atendimento Rick and Morty</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de Atendimento - Rick and Morty</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="app">
     <header>
-      <h1>Central de Atendimento Rick and Morty</h1>
-      <p>Simulação de fila FIFO com consumo da API pública Rick and Morty.</p>
+        <h1>Central de Atendimento Rick and Morty</h1>
+        <p>O primeiro do multiverso a chegar é o primeiro a ser atendido!</p>
     </header>
 
-    <section class="controls card">
-      <button id="add-customer-btn">Adicionar Personagem Aleatório</button>
-      <button id="serve-customer-btn">Atender Próximo</button>
-      <button id="clear-queue-btn" class="danger">Limpar Fila</button>
-    </section>
+    <main>
+        <section class="controles">
+            <button id="btn-adicionar">Chamar Novo Personagem</button>
+            <button id="btn-atender" class="danger">Atender Próximo</button>
+        </section>
 
-    <section class="layout">
-      <article class="card current-panel">
-        <h2>Em atendimento</h2>
-        <div id="current-customer" class="placeholder">
-          Nenhum personagem em atendimento.
-        </div>
-      </article>
+        <section id="atendimento-atual">
+            <p class="mensagem-vazia">Nenhum personagem está em atendimento no momento.</p>
+        </section>
 
-      <article class="card queue-panel">
-        <h2>Sala de espera (FIFO)</h2>
-        <ul id="queue-list"></ul>
-      </article>
-    </section>
+        <section class="container-fila">
+            <h2>Sala de Espera: <span id="contador">0</span> personagens</h2>
+            <div id="visualizacao-fila" class="fila-wrapper">
+                <p class="mensagem-vazia">A sala de espera está vazia.</p>
+            </div>
+        </section>
+    </main>
 
-    <section class="card history-panel">
-      <h2>Histórico de atendimentos</h2>
-      <ul id="history-list"></ul>
-    </section>
-
-    <section id="status" class="status" aria-live="polite"></section>
-  </main>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
