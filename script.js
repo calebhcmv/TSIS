@@ -1,182 +1,108 @@
-class Queue {
-  constructor() {
-    this.items = [];
-  }
+class Fila {
+    constructor() {
+        this.itens = [];
+    }
 
-  enqueue(item) {
-    this.items.push(item);
-  }
+    enqueue(item) {
+        // adiciona o personagem no final da fila
+        this.itens.push(item);
+    }
 
-  dequeue() {
-    if (this.isEmpty()) return null;
-    return this.items.shift();
-  }
+    dequeue() {
+        if (this.isEmpty()) return null;
+        // remove o primeiro personagem da fila
+        return this.itens.shift();
+    }
 
-  front() {
-    return this.isEmpty() ? null : this.items[0];
-  }
+    isEmpty() {
+        return this.itens.length === 0;
+    }
 
-  isEmpty() {
-    return this.items.length === 0;
-  }
-
-  clear() {
-    this.items = [];
-  }
-
-  values() {
-    return [...this.items];
-  }
+    size() {
+        return this.itens.length;
+    }
 }
 
-const queue = new Queue();
-const history = [];
-const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+const minhaFila = new Fila();
+const filaContainer = document.getElementById('visualizacao-fila');
+const contadorElemento = document.getElementById('contador');
+let personagemSendoAtendido = null;
 
-const addButton = document.getElementById("add-customer-btn");
-const serveButton = document.getElementById("serve-customer-btn");
-const clearButton = document.getElementById("clear-queue-btn");
-const queueList = document.getElementById("queue-list");
-const historyList = document.getElementById("history-list");
-const currentCustomer = document.getElementById("current-customer");
-const statusArea = document.getElementById("status");
-
-function renderCharacter(character) {
-  return `
-    <div class="character">
-      <img src="${character.image}" alt="${character.name}">
-      <div>
-        <h3>${character.name}</h3>
-        <p><strong>Espécie:</strong> ${character.species}</p>
-        <p><strong>Status:</strong> ${character.status}</p>
-      </div>
-    </div>
-  `;
+async function buscarDadosDaAPI() {
+    const idAleatorio = Math.floor(Math.random() * 826) + 1;
+    try {
+        const response = await fetch(`https://rickandmortyapi.com/api/character/${idAleatorio}`);
+        const data = await response.json();
+        return {
+            nome: data.name,
+            imagem: data.image,
+            especie: data.species,
+            status: data.status
+        };
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
 }
 
-function renderQueue() {
-  const items = queue.values();
-
-  if (items.length === 0) {
-    queueList.innerHTML = '<li class="placeholder">Fila vazia.</li>';
-    serveButton.disabled = true;
-    return;
-  }
-
-  queueList.innerHTML = items
-    .map((person, index) => {
-      return `
-        <li class="queue-item">
-          <strong>#${index + 1}</strong>
-          ${renderCharacter(person)}
-        </li>
-      `;
-    })
-    .join("");
-
-  serveButton.disabled = false;
+async function adicionarItem() {
+    const personagem = await buscarDadosDaAPI();
+    if (personagem) {
+        minhaFila.enqueue(personagem);
+        renderizarFila();
+    }
 }
 
-function renderCurrent(customer) {
-  if (!customer) {
-    currentCustomer.classList.add("placeholder");
-    currentCustomer.textContent = "Nenhum personagem em atendimento.";
-    return;
-  }
+function atenderItem() {
+    if (minhaFila.isEmpty()) {
+        alert("Não há ninguém na sala de espera!");
+        return;
+    }
+    
+    personagemSendoAtendido = minhaFila.dequeue();
+    
+    try {
+        const audio = new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3');
+        audio.play();
+    } catch (e) {
+        console.error("Erro ao reproduzir áudio:", e);
+    }
 
-  currentCustomer.classList.remove("placeholder");
-  currentCustomer.innerHTML = renderCharacter(customer);
+    renderizarFila();
 }
 
-function renderHistory() {
-  if (history.length === 0) {
-    historyList.innerHTML = '<li class="placeholder">Nenhum atendimento realizado.</li>';
-    return;
-  }
+function renderizarFila() {
+    contadorElemento.innerText = minhaFila.size();
 
-  historyList.innerHTML = history
-    .map((person, index) => {
-      return `
-        <li class="history-item">
-          <strong>Atendimento ${index + 1}:</strong> ${person.name} (${person.species})
-        </li>
-      `;
-    })
-    .join("");
-}
+    const areaAtendimento = document.getElementById('atendimento-atual');
+    if (personagemSendoAtendido && areaAtendimento) {
+        areaAtendimento.innerHTML = `
+            <div class="card-atendimento">
+                <h3>Em Atendimento</h3>
+                <img src="${personagemSendoAtendido.imagem}" width="150" alt="${personagemSendoAtendido.nome}">
+                <p><strong>${personagemSendoAtendido.nome}</strong></p>
+                <p>${personagemSendoAtendido.especie} - ${personagemSendoAtendido.status}</p>
+            </div>
+        `;
+    }
 
-function setStatus(message, type = "ok") {
-  statusArea.textContent = message;
-  statusArea.className = `status ${type}`;
-}
+    filaContainer.innerHTML = '';
 
-async function fetchRandomCharacter() {
-  const maxId = 826;
-  const randomId = Math.floor(Math.random() * maxId) + 1;
-  const response = await fetch(`https://rickandmortyapi.com/api/character/${randomId}`);
+    if (minhaFila.isEmpty()) {
+        filaContainer.innerHTML = '<p class="mensagem-vazia">A sala de espera está vazia.</p>';
+        return;
+    }
 
-  if (!response.ok) {
-    throw new Error("Falha ao buscar personagem na API.");
-  }
-
-  return response.json();
-}
-
-async function addCharacterToQueue() {
-  addButton.disabled = true;
-  setStatus("Buscando personagem...");
-
-  try {
-    const character = await fetchRandomCharacter();
-
-    queue.enqueue({
-      id: character.id,
-      name: character.name,
-      image: character.image,
-      species: character.species,
-      status: character.status
+    minhaFila.itens.forEach((p, index) => {
+        const div = document.createElement('div');
+        div.className = 'item-fila';
+        div.innerHTML = `
+            <img src="${p.imagem}" width="80" alt="${p.nome}">
+            <p>#${index + 1} - ${p.nome}</p>
+        `;
+        filaContainer.appendChild(div);
     });
-
-    renderQueue();
-    setStatus(`${character.name} entrou na fila.`);
-  } catch (error) {
-    setStatus(error.message, "error");
-  } finally {
-    addButton.disabled = false;
-  }
 }
 
-function serveCharacter() {
-  const nextCharacter = queue.dequeue();
-
-  if (!nextCharacter) {
-    setStatus("Não há personagens para atender.", "error");
-    renderQueue();
-    return;
-  }
-
-  renderCurrent(nextCharacter);
-  history.unshift(nextCharacter);
-  audio.currentTime = 0;
-  audio.play().catch(() => {
-    setStatus("Atendido, mas o navegador bloqueou o som automático.");
-  });
-
-  renderQueue();
-  renderHistory();
-  setStatus(`${nextCharacter.name} foi atendido(a).`);
-}
-
-function clearQueue() {
-  queue.clear();
-  renderQueue();
-  setStatus("Fila limpa com sucesso.");
-}
-
-addButton.addEventListener("click", addCharacterToQueue);
-serveButton.addEventListener("click", serveCharacter);
-clearButton.addEventListener("click", clearQueue);
-
-renderQueue();
-renderHistory();
-renderCurrent(queue.front());
+document.getElementById('btn-adicionar').addEventListener('click', adicionarItem);
+document.getElementById('btn-atender').addEventListener('click', atenderItem);
